@@ -1,1 +1,44 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login test</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; font-size: 18px; }
+  input, button { font-size: 18px; padding: 12px; width: 100%; box-sizing: border-box; margin-top: 10px; }
+  pre { white-space: pre-wrap; background: #eee; padding: 12px; border-radius: 8px; min-height: 120px; }
+</style>
+</head>
+<body>
+<h2>Login test</h2>
+<input id="pw" type="password" placeholder="Password">
+<button id="go">Test karo</button>
+<pre id="out">Yahan result dikhega.</pre>
+<script>
+const out = document.getElementById("out");
+function log(t) { out.textContent += "\n" + t; }
+document.getElementById("go").addEventListener("click", async () => {
+  out.textContent = "Button dabaya gaya.";
+  const pw = document.getElementById("pw").value;
+  log("Password ki lambai: " + pw.length + " akshar");
+  log("Server ko bhej raha hoon... (50 second tak lag sakte hain)");
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 70000);
+  try {
+    const res = await fetch("https://leadgen-backend-b787.onrender.com/api/auth-check", {
+      headers: { "x-app-password": pw },
+      signal: ctrl.signal
+    });
+    const text = await res.text();
+    log("Status: " + res.status);
+    log("Jawab: " + text);
+  } catch (e) {
+    log("Error: " + e.name + " - " + e.message);
+  } finally {
+    clearTimeout(t);
+  }
+});
+</script>
+</body>
+</html>
